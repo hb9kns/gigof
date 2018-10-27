@@ -24,7 +24,7 @@ ion `date -u`.	"
 
 # # do not change anything below
 
-usage() { cat <<EOH
+usage() { cat <<EOH >&2
 usage: $0 <username>
 
 Install an account for <username> with a $pgd directory
@@ -64,13 +64,10 @@ fi
 
 echo :: usr=$usr
 
-# check for existing user or -f option
-if id $usr 2>/dev/null
+# check for existing user
+if id $usr >/dev/null 2>&1
 then uid=`id -u $usr 2>/dev/null`
- cat <<EOI
-:: user $usr($uid) exists but no '-f' option given,
-:: aborting!
-EOI
+ echo :: user $usr exists, aborting!
  exit 7
 fi
 
