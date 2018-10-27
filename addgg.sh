@@ -3,6 +3,8 @@
 
 # minimal user id for generated accounts
 minid=2001
+# minimal user name length
+minlen=3
 # additional group the user will be part of
 ggroup=gigofs
 # public gopher directory name
@@ -16,44 +18,38 @@ gitdomain=localhost
 # homes
 hdir=/home
 # initial gophermap, USRN will be replaced by user name
-igm="i	USRN's gophermap
-i	This gophermap was created by $0
-i	on `date -u`."
+igm="iUSRN's gophermap	
+iThis gophermap was created by $0	
+ion `date -u`.	"
 
 # # do not change anything below
 
 usage() { cat <<EOH
-usage: $0 [-f] [-l] <username>
+usage: $0 <username>
 
 Install an account for <username> with a $pgd directory
 (which is a git repo with prepared hooks for direct publication
 after pushing to the repo), and member of group $ggroup.
 If several usernames are given, only the last one will be used.
-username must be at least 4 characters, only lowercase letters
+username must be at least $minlen characters, only lowercase letters
 or numbers (but beginning with a lowercase letter),
 and will be truncated to 8 characters maximum.
+In addition, $ggroup is not allowed as <username>.
 
 STDIN will be read for public ssh keys.
-
-Option -f will force account generation even if <username>
-is already existing (iff the user ID is higher than $minid),
-and option -l will permit ssh login through /bin/sh but not
-with password authentication (only ssh pubkey).
+No password access will be possible, only pubkey.
 
 Evidently, this script must be run as root or through sudo.
 EOH
 }
 
 # common options for useradd
-addopts="--create-home --groups $ggroup"
+addopts="--create-home --shell /bin/sh --groups $ggroup"
 
-forceadd=no
-allowlogin=no
 usr=''
 while test "$1" != ""
 do case $1 in
- -f) forceadd=yes ;;
- -l) allowlogin=yes ;;
+ -*) echo :: ignoring option $1 ;;
  *) usr=$1 ;;
  esac
  shift
@@ -61,27 +57,21 @@ done
 
 # remove all but 0-9a-z, leading numbers, and all after 8 initial characters
 usr=`echo $usr | tr -c -d '0-9a-z' | sed -e s'/[0-9]*\(........\).*/\1/'`
-if test "${#usr}" -lt 4
+if test ${#usr} -lt $minlen -o $usr = $ggroup
 then usage
  exit 9
 fi
 
-echo :: forceadd=$forceadd allowlogin=$allowlogin usr=$usr
+echo :: usr=$usr
 
 # check for existing user or -f option
 if id $usr 2>/dev/null
 then uid=`id -u $usr 2>/dev/null`
- if test $forceadd = no
- then cat <<EOI
+ cat <<EOI
 :: user $usr($uid) exists but no '-f' option given,
 :: aborting!
 EOI
-  exit 7
- else cat <<EOI
-:: user $usr($uid) exists, and '-f' option given
-:: but not implemented, therefore aborting anyway!
-EOI
- fi
+ exit 7
 fi
 
 echo :: reading pubkeys ...
@@ -98,13 +88,9 @@ if test $npbk -le 0
 then echo :: no pubkey defined, will have to be added manually
 fi
 
-if test $allowlogin = yes
-then UID_MIN=$minid useradd $addopts $usr
-else UID_MIN=$minid useradd $addopts --shell /bin/nologin $usr
-fi
-
+# create user with uid higher than $minid
+UID_MIN=$minid useradd $addopts $usr
 sync
-sleep 1
 
 oldd=`pwd`
 if cd $hdir/$usr
