@@ -57,7 +57,7 @@ done
 
 # remove all but 0-9a-z, leading numbers, and all after 8 initial characters
 usr=`echo $usr | tr -c -d '0-9a-z' | sed -e s'/[0-9]*\(........\).*/\1/'`
-if test ${#usr} -lt $minlen -o $usr = $ggroup
+if test ${#usr} -lt $minlen -o "$usr" = "$ggroup"
 then usage
  exit 9
 fi
