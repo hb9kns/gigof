@@ -38,6 +38,7 @@ In addition, $ggroup is not allowed as <username>.
 
 STDIN will be read for public ssh keys.
 No password access will be possible, only pubkey.
+This script needs the 'useradd' tool to be available.
 
 Evidently, this script must be run as root or through sudo.
 EOH
@@ -85,9 +86,15 @@ if test $npbk -le 0
 then echo :: no pubkey defined, will have to be added manually
 fi
 
-# create user with uid higher than $minid
-UID_MIN=$minid useradd $addopts $usr
-sync
+if test -x useradd
+then
+ echo :: creating $usr with uid higher than $minid
+ UID_MIN=$minid useradd $addopts $usr
+ sync
+else
+ echo :: missing useradd tool, aborting
+ exit 5
+fi
 
 oldd=`pwd`
 if cd $hdir/$usr
@@ -132,5 +139,5 @@ else cat <<EOI
 :: could not cd to homedir of $usr
 ::  aborting!
 EOI
- exit 5
+ exit 3
 fi
