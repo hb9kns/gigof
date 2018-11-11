@@ -1,10 +1,10 @@
 #!/bin/sh
-# add git gopher user and set up their directories
+# add git-only gopher user and set up their directories
 
 # minimal user id for generated accounts
 minid=2001
 # minimal user name length
-minlen=3
+minlen=4
 # additional group the user will be part of
 ggroup=gigofs
 # public gopher directory name
@@ -24,28 +24,39 @@ ion `date -u`.	"
 
 # # do not change anything below
 
+# find git-shell
+gitshell=`command -v git-shell`
+if test "$gitshell" = ""
+then echo :: cannot find git-shell, aborting!
+ exit 11
+fi
+
 usage() { cat <<EOH >&2
 usage: $0 <username>
 
-Install an account for <username> with a $pgd directory
+Install an account for <username> with a '$pgd' directory
 (which is a git repo with prepared hooks for direct publication
-after pushing to the repo), and member of group $ggroup.
+after pushing to the repo), and member of group '$ggroup'.
+A bare repo '$ggr' will be installed in the user's home,
+which can be pulled/pushed and will update '$pgd'.
+
 If several usernames are given, only the last one will be used.
-username must be at least $minlen characters, only lowercase letters
+<username> must be at least $minlen characters, only lowercase letters
 or numbers (but beginning with a lowercase letter),
 and will be truncated to 8 characters maximum.
-In addition, $ggroup is not allowed as <username>.
+In addition, '$ggroup' is not allowed as <username>.
 
 STDIN will be read for public ssh keys.
 No password access will be possible, only pubkey.
-This script needs the 'useradd' tool to be available.
+The user's shell will be '$gitshell'.
 
-Evidently, this script must be run as root or through sudo.
+This script needs the 'useradd' tool to be available,
+and evidently must be run as root or through sudo.
 EOH
 }
 
 # common options for useradd
-addopts="--create-home --shell /bin/sh --groups $ggroup"
+addopts="--create-home --shell $gitshell --groups $ggroup"
 
 usr=''
 while test "$1" != ""
@@ -86,10 +97,17 @@ if test $npbk -le 0
 then echo :: no pubkey defined, will have to be added manually
 fi
 
-if test -x useradd
+# find useradd
+usradd=`command -v useradd`
+if test "$usradd" = ""
+then echo :: cannot find useradd, aborting!
+ exit 6
+fi
+
+if test -x $usradd
 then
  echo :: creating $usr with uid higher than $minid
- UID_MIN=$minid useradd $addopts $usr
+ UID_MIN=$minid $usradd $addopts $usr
  sync
 else
  echo :: missing useradd tool, aborting
@@ -119,7 +137,7 @@ echo post-update:
 unset GIT_DIR
 cd "$hdir/$usr/$pgd" && git pull && git checkout . && chmod a+r *
 EOH
- chown $usr:$ggroup $ggr/$githook
+ chown root:$ggroup $ggr/$githook
  chmod 755 $ggr/$githook
  cd $pgd
  sudo -u $usr git remote add origin ~$usr/$ggr
