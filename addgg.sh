@@ -153,6 +153,9 @@ EOH
  chmod 755 $ggr/$githook
  if test $gslink = yes
  then
+  echo :: installing git-shell-commands link to $gsdir
+  ln -s "$oldd/$gsdir" git-shell-commands
+ else
   if test -d "$oldd/$gsdir" -a -r "$oldd/$gsdir" -a -x "$oldd/$gsdir"
   then echo :: installing git-shell-commands directory with contents of $gsdir
    mkdir git-shell-commands
@@ -162,9 +165,6 @@ EOH
    chmod 755 git-shell-commands/*
   else echo :: no readable git-shell-commands template found
   fi
- else
-  echo :: installing git-shell-commands link to $gsdir
-  ln -s "$oldd/$gsdir" git-shell-commands
  fi
  echo :: initializing working gopher directory
  cd $pgd
