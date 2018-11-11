@@ -1,4 +1,5 @@
 #!/bin/sh
+info='addgg.sh/gigofs // 18-11-11 // HB9KNS'
 # add git-only gopher user and set up their directories
 
 # minimal user id for generated accounts
@@ -19,7 +20,7 @@ gitdomain=localhost
 hdir=/home
 # initial gophermap, USRN will be replaced by user name
 igm="iUSRN's gophermap	
-iThis gophermap was created by $0	
+iautomatically created by $info	
 ion `date -u`.	"
 
 # # do not change anything below
@@ -32,15 +33,15 @@ then echo :: cannot find git-shell, aborting!
 fi
 
 usage() { cat <<EOH >&2
-usage: $0 <username>
+($info)
+usage: $0 [-s <git-shell-dir>] <username>
 
-Install an account for <username> with a '$pgd' directory
-(which is a git repo with prepared hooks for direct publication
-after pushing to the repo), and member of group '$ggroup'.
-A bare repo '$ggr' will be installed in the user's home,
+Install account for <username> with a '$pgd' directory
+(git repo with prepared hooks for direct publication after
+pushing to the repo), and member of group '$ggroup'.
+Bare repo '$ggr' will be installed in the user's home,
 which can be pulled/pushed and will update '$pgd'.
 
-If several usernames are given, only the last one will be used.
 <username> must be at least $minlen characters, only lowercase letters
 or numbers (but beginning with a lowercase letter),
 and will be truncated to 8 characters maximum.
@@ -48,7 +49,10 @@ In addition, '$ggroup' is not allowed as <username>.
 
 STDIN will be read for public ssh keys.
 No password access will be possible, only pubkey.
-The user's shell will be '$gitshell'.
+The user's shell will be '$gitshell', and if
+<git-shell-dir> is readable, the contained scripts
+will be made available for interactive login
+(otherwise, no interactive login will be possible).
 
 This script needs the 'useradd' tool to be available,
 and evidently must be run as root or through sudo.
@@ -61,6 +65,7 @@ addopts="--create-home --shell $gitshell --groups $ggroup"
 usr=''
 while test "$1" != ""
 do case $1 in
+ -s) gsdir="$2" ; echo :: git-shell-dir=$gsdir ; shift ;;
  -*) echo :: ignoring option $1 ;;
  *) usr=$1 ;;
  esac
@@ -123,10 +128,11 @@ then
  chmod 755 $pgd
  chown $usr:$ggroup $pgd/gophermap
  chmod 644 $pgd/gophermap
- echo :: setting up git repos
+ echo :: setting up git config
  sudo -u $usr git config --global user.name $usr
  sudo -u $usr git config --global user.email $usr@localhost
  sudo -u $usr git config --global push.default simple
+ echo :: setting up git repos
  sudo -u $usr git init $pgd
  sudo -u $usr git init --bare $ggr
  echo :: setting up git hook
@@ -139,10 +145,21 @@ cd "$hdir/$usr/$pgd" && git pull && git checkout . && chmod a+r *
 EOH
  chown root:$ggroup $ggr/$githook
  chmod 755 $ggr/$githook
+ if test -d "$oldd/$gsdir" -a -r "$oldd/$gsdir" -a -x "$oldd/$gsdir"
+ then echo :: installing git-shell-commands directory with contents of $gsdir
+  mkdir git-shell-commands
+  chown root:$ggroup git-shell-commands
+  chmod 2755 git-shell-commands
+  /bin/cp "$oldd/$gsdir"/* git-shell-commands/
+  chmod 755 git-shell-commands/*
+ else echo :: no readable git-shell-commands template found,
+  echo :: therefore git-shell will be non-interactive
+ fi
+ echo :: initializing working gopher directory
  cd $pgd
  sudo -u $usr git remote add origin ~$usr/$ggr
  sudo -u $usr git add gophermap
- sudo -u $usr git commit -m initial
+ sudo -u $usr git commit -m "initial by $info"
  sudo -u $usr git push -u origin master
  cd -
  echo :: adding .ssh/authorized_keys
@@ -151,7 +168,7 @@ EOH
  echo "$pubkeys" >> authorized_keys
  chown $usr:$ggroup authorized_keys
  chmod 700 .
- chmod 640 authorized_keys
+ chmod 644 authorized_keys
  cd "$oldd"
 else cat <<EOI
 :: could not cd to homedir of $usr
