@@ -34,7 +34,7 @@ fi
 
 usage() { cat <<EOH >&2
 ($info)
-usage: $0 [-s <git-shell-dir>] <username>
+usage: $0 [-s|-l <git-shell-dir>] <username>
 
 Install account for <username> with a '$pgd' directory
 (git repo with prepared hooks for direct publication after
@@ -47,12 +47,10 @@ or numbers (but beginning with a lowercase letter),
 and will be truncated to 8 characters maximum.
 In addition, '$ggroup' is not allowed as <username>.
 
-STDIN will be read for public ssh keys.
-No password access will be possible, only pubkey.
-The user's shell will be '$gitshell', and if
-<git-shell-dir> is readable, the contained scripts
-will be made available for interactive login
-(otherwise, no interactive login will be possible).
+STDIN will be read for public ssh keys; No password access, only pubkey.
+The user's shell will be '$gitshell', and if <git-shell-dir> is readable,
+the contained scripts will be made available for interactive login;
+with '-s' they will be copied, with '-l' a symbolic link will be installed.
 
 This script needs the 'useradd' tool to be available,
 and evidently must be run as root or through sudo.
@@ -63,9 +61,17 @@ EOH
 addopts="--create-home --shell $gitshell --groups $ggroup"
 
 usr=''
+gslink=no
 while test "$1" != ""
 do case $1 in
- -s) gsdir="$2" ; echo :: git-shell-dir=$gsdir ; shift ;;
+ -s) gsdir="$2"
+    gslink=no
+    echo :: git-shell-dir=$gsdir
+    shift ;;
+ -l) gsdir="$2"
+    gslink=yes
+    echo :: git-shell-dir-link=$gsdir
+    shift ;;
  -*) echo :: ignoring option $1 ;;
  *) usr=$1 ;;
  esac
@@ -145,15 +151,20 @@ cd "$hdir/$usr/$pgd" && git pull && git checkout . && chmod a+r *
 EOH
  chown root:$ggroup $ggr/$githook
  chmod 755 $ggr/$githook
- if test -d "$oldd/$gsdir" -a -r "$oldd/$gsdir" -a -x "$oldd/$gsdir"
- then echo :: installing git-shell-commands directory with contents of $gsdir
-  mkdir git-shell-commands
-  chown root:$ggroup git-shell-commands
-  chmod 2755 git-shell-commands
-  /bin/cp "$oldd/$gsdir"/* git-shell-commands/
-  chmod 755 git-shell-commands/*
- else echo :: no readable git-shell-commands template found,
-  echo :: therefore git-shell will be non-interactive
+ if test $gslink = yes
+ then
+  if test -d "$oldd/$gsdir" -a -r "$oldd/$gsdir" -a -x "$oldd/$gsdir"
+  then echo :: installing git-shell-commands directory with contents of $gsdir
+   mkdir git-shell-commands
+   chown root:$ggroup git-shell-commands
+   chmod 2755 git-shell-commands
+   /bin/cp "$oldd/$gsdir"/* git-shell-commands/
+   chmod 755 git-shell-commands/*
+  else echo :: no readable git-shell-commands template found
+  fi
+ else
+  echo :: installing git-shell-commands link to $gsdir
+  ln -s "$oldd/$gsdir" git-shell-commands
  fi
  echo :: initializing working gopher directory
  cd $pgd

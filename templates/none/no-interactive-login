@@ -1,8 +1,10 @@
 #!/bin/sh
 cat <<EOT
 Welcome $USER, you have successfully logged in!
+
 However, this system does not provide interactive access, sorry.
-Please use git-push and git-pull only.
+Please use git clone/push/pull on gopher.git to access your gopher dir.
+
 (closing connection at `date`)
 EOT
 exit 128

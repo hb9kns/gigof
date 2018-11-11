@@ -1,0 +1,38 @@
+#!/bin/sh
+outbox=$HOME/outbox
+outflag=$HOME/outbox.flag
+cat <<EOT
+Sending message to sysadmin:
+Please enter message and finish with a single dot '.' or CTRL-D on a line,
+or with the word ABANDON on a line to abandon and not send!
+
+EOT
+
+msg=''
+line=''
+while read line
+do case $line in
+ .) break ;;
+ ABANDON) exit ;;
+ *) msg="$msg
+    $line" ;;
+esac
+done
+
+cat <<EOT
+You entered:$msg
+
+Please confirm with OK
+EOT
+
+read line
+if test "$line" = "OK"
+then cat <<EOM >>$outbox
+From $USER
+Date `date`
+$msg
+
+EOM
+ date >$outflag
+else echo no message sent
+fi

@@ -1,0 +1,15 @@
+#!/bin/sh
+cat <<EOT
+Welcome $USER, you have successfully logged in!
+
+Please use git clone/push/pull to access your repo(s).
+In addition, you may use the following commands:
+
+* dir : display home directory
+  (names with extension '.git' probably can be cloned)
+* write : send message to system admin
+* read : read messages from system admin (end with 'q')
+* stat : display system status
+* quit or exit : close this shell
+
+EOT
