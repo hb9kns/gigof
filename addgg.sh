@@ -100,8 +100,8 @@ npbk=0
 pubkeys=''
 while read pbk
 do echo :: adding pubkey ...${pbk##* }
- pubkeys="$pbk
-"
+ pubkeys="$pubkeys
+$pbk"
  npbk=$(( $npbk+1 ))
 done
 if test $npbk -le 0
@@ -141,6 +141,8 @@ then
  echo :: setting up git repos
  sudo -u $usr git init $pgd
  sudo -u $usr git init --bare $ggr
+ chmod 700 $pgd/.git
+ chmod 700 $ggr
  echo :: setting up git hook
  cat <<EOH >$ggr/$githook
 #!/bin/sh
