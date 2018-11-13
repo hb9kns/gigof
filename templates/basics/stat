@@ -6,4 +6,6 @@ uptime
 echo
 df -h
 echo
+du -hs $HOME
+echo
 date -u
