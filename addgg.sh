@@ -1,5 +1,5 @@
 #!/bin/sh
-info='addgg.sh/gigofs // 18-11-11 // HB9KNS'
+info='addgg.sh/gigofs // 18-11-15 // HB9KNS'
 # add git-only gopher user and set up their directories
 
 # minimal user id for generated accounts
@@ -60,14 +60,18 @@ EOH
 # common options for useradd
 addopts="--create-home --shell $gitshell --groups $ggroup"
 
+# username empty, symlink flag cleared
 usr=''
 gslink=no
+
 while test "$1" != ""
 do case $1 in
+# option for copied command directory
  -s) gsdir="$2"
     gslink=no
     echo :: git-shell-dir=$gsdir
     shift ;;
+# option for symlinked command directory
  -l) gsdir="$2"
     gslink=yes
     echo :: git-shell-dir-link=$gsdir
@@ -94,7 +98,7 @@ then uid=`id -u $usr 2>/dev/null`
  exit 7
 fi
 
-echo :: reading pubkeys ...
+echo :: reading pubkeys, end with CTRL-D ...
 
 npbk=0
 pubkeys=''
@@ -118,6 +122,7 @@ fi
 if test -x $usradd
 then
  echo :: creating $usr with uid higher than $minid
+# specific Linux!
  UID_MIN=$minid $usradd $addopts $usr
  sync
 else
@@ -125,7 +130,9 @@ else
  exit 5
 fi
 
+# save current working directory
 oldd=`pwd`
+# try to cd to new user homedir
 if cd $hdir/$usr
 then
  echo :: adding public_gopher dir and initial gophermap
@@ -135,8 +142,10 @@ then
  chown $usr:$ggroup $pgd/gophermap
  chmod 644 $pgd/gophermap
  echo :: setting up git config
+# generate privacy-protecting user info
  sudo -u $usr git config --global user.name $usr
  sudo -u $usr git config --global user.email $usr@localhost
+# set usual push behavior
  sudo -u $usr git config --global push.default simple
  echo :: setting up git repos
  sudo -u $usr git init $pgd
@@ -144,13 +153,16 @@ then
  chmod 700 $pgd/.git
  chmod 700 $ggr
  echo :: setting up git hook
+# hook script in bare repo: pull updated content into working directory
+# and make everything world readable
  cat <<EOH >$ggr/$githook
 #!/bin/sh
 # hook installed by $0
 echo post-update:
 unset GIT_DIR
-cd "$hdir/$usr/$pgd" && git pull && git checkout . && chmod a+r *
+cd "$hdir/$usr/$pgd" && git pull && git checkout . && chmod -R a+r *
 EOH
+# prevent githook from being modified
  chown root:$ggroup $ggr/$githook
  chmod 755 $ggr/$githook
  if test $gslink = yes
@@ -161,8 +173,9 @@ EOH
   if test -d "$oldd/$gsdir" -a -r "$oldd/$gsdir" -a -x "$oldd/$gsdir"
   then echo :: installing git-shell-commands directory with contents of $gsdir
    mkdir git-shell-commands
+# prevent scripts from being modified
    chown root:$ggroup git-shell-commands
-   chmod 2755 git-shell-commands
+   chmod 3755 git-shell-commands
    /bin/cp "$oldd/$gsdir"/* git-shell-commands/
    chmod 755 git-shell-commands/*
   else echo :: no readable git-shell-commands template found
@@ -170,6 +183,7 @@ EOH
  fi
  echo :: initializing working gopher directory
  cd $pgd
+# link working to bare repo
  sudo -u $usr git remote add origin ~$usr/$ggr
  sudo -u $usr git add gophermap
  sudo -u $usr git commit -m "initial by $info"
