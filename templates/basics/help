@@ -11,6 +11,7 @@ In addition, you may use the following commands:
 * write : send message to system admin
 * read : read messages from system admin (end with 'q')
 * stat : display system status and disk usage of home directory
+* tidy : search for '.git' and do 'git gc' and 'git fsck' there
 * quit or exit : close this shell
 
 Please note: message exchange with sysadmin may be slow -- patience!

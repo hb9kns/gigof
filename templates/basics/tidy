@@ -1,0 +1,10 @@
+#!/bin/sh
+echo trying to tidy up all .git
+find . -name '*.git' | { while read dd
+ do echo :: $dd
+  cd "$dd"
+  git gc
+  git fsck
+  cd - >/dev/null
+ done
+}
