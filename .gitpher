@@ -1,0 +1,4 @@
+[gitpher]
+short_descr = scripts for setting up and managing git-gopher accounts
+description = These scripts permit setting up user accounts which can publish gopher content through git-shell and git push/pull, and to manage them. They were developed and are used for dome.circumlunar.space.
+patch_email = yargo@sdf.org
