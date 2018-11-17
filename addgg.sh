@@ -160,8 +160,7 @@ then
 # hook installed by $0
 echo post-update:
 unset GIT_DIR
-cd "$hdir/$usr/$pgd" && git pull && git checkout .
-chmod -R a+r *
+cd "$hdir/$usr/$pgd" && git pull && git checkout . && chmod -R a+r *
 find . -type f -execdir chmod a-x {} '+'
 EOH
 # prevent githook from being modified
