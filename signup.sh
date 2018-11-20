@@ -4,8 +4,8 @@
 # submissions log
 submit=$HOME/submissions.txt
 lockf=$submit.lock
+# where submission status will be reported
 substat='gopher://dome.circumlunar.space/1/submissions/'
-
 # timeout/seconds
 grace=300
 mdgrace=$(( 10*$grace/864 ))
@@ -114,8 +114,8 @@ do read pubpart
  esac
 done
 
-# ::: calculate hash of name+pubkey+time
-subid='#########'
+# generate random submission id
+subid=`uuidgen | tr -c -d 0-9 | sed -e 's/$/ 925737%74263+p/'|dc`
 
 cat <<EOT
 your entered key data:
@@ -123,12 +123,12 @@ your entered key data:
 $pubkey
 ---
 
-Please confirm correctness of submitted information by entering "OK"
+Please confirm correctness of submitted information with "ok"
 (without the quotes)!
 EOT
 
 read pubpart
-if test "$pubpart" = "OK"
+if test "$pubpart" = "ok" -o "$pubpart" = "OK"
 then cat <<EOT >> $submit
 
 # `date -u`
@@ -141,9 +141,9 @@ then cat <<EOT >> $submit
 EOT
  cat <<EOT
 Thank you for your submission! It will be reviewed as soon as possible.
-Submission status can be requested as documented at
+Status report of submission can be requested at
  $substat
-with the submission ID $subid -- please save for future reference!
+with submission ID $subid -- please save for future reference!
 
 EOT
 else echo submission process aborted
