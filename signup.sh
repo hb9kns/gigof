@@ -4,9 +4,11 @@
 # submissions log
 submit=$HOME/submissions.txt
 lockf=$submit.lock
+substat='gopher://dome.circumlunar.space/1/submissions/'
 
 # timeout/seconds
 grace=300
+mdgrace=$(( 10*$grace/864 ))
 # minimal length of new user name
 minlen=4
 # illegal/reserved names (in addition to those in /etc/passwd and /etc/group)
@@ -46,13 +48,16 @@ trap timeout ALRM
 watchdog $$ &
 wpid=$!
 
-echo starting up...
-sleep 2
+echo BUILDING LINK...
+sleep 1
+echo CARRIER DETECTED. SYNCHRONIZING LOCAL OSCILLATOR...
+sleep 1
+
 cat <<EOH
 
 Welcome to the application process for new accounts!
-You have $grace seconds to finish this;
-after that time, the process will abort.
+You have $mdgrace millidays to finish this.
+After that time, the process will abort.
 You can abort at any time with ^C (CTRL-C).
 
 Please enter your desired username!
@@ -81,10 +86,16 @@ done
 
 cat <<EOT
 
-Please enter an ssh public key string (NOT private key)
+Please enter one or several ssh public key strings (NOT private key)
 which will allow you to login with the username $newname.
 
-You may enter it on several lines, which will be concatenated.
+You may enter them on several lines.  They will be read by a human,
+therefore you can be quite generous with the formatting. However, they
+have to be valid pubkeys, otherwise the account will be created but
+login will simply be impossible.
+You may also add comments for the account request procedure.
+Entry will abort if more than about 9 kB of text is received.
+
 End your entry with a single '.' (dot) on a line.
 You can start over by entering 'X' (capital X) on a line.
 
@@ -92,7 +103,7 @@ EOT
 
 pubkey=''
 pubpart=''
-while test "$pubpart" != "."
+while test "$pubpart" != "." -a ${#pubkey} -lt 9999
 do read pubpart
  case $pubpart in
   X) pubkey=''
@@ -103,23 +114,40 @@ do read pubpart
  esac
 done
 
+# ::: calculate hash of name+pubkey+time
+subid='#########'
+
 cat <<EOT
-your entered key:
+your entered key data:
 ---
 $pubkey
 ---
 
-Thank you for your submission!
+Please confirm correctness of submitted information by entering "OK"
+(without the quotes)!
 EOT
 
-cat <<EOT >> $submit
+read pubpart
+if test "$pubpart" = "OK"
+then cat <<EOT >> $submit
 
 # `date -u`
  SSH_CLIENT=$SSH_CLIENT
  newname=$newname
+ subid=$subid
  pubkey=$pubkey
 
 -----
 EOT
+ cat <<EOT
+Thank you for your submission! It will be reviewed as soon as possible.
+Submission status can be requested as documented at
+ $substat
+with the submission ID $subid -- please save for future reference!
+
+EOT
+else echo submission process aborted
+fi
 
 kill $wpid
+echo ........................................................NO CARRIER
