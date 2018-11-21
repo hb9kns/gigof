@@ -26,7 +26,7 @@ Please confirm with OK
 EOT
 
 read line
-if test "$line" = "OK"
+if test "$line" = "ok" -o "$line" = "OK"
 then cat <<EOM >>$outbox
 From $USER
 Date `date`

@@ -1,5 +1,5 @@
 #!/bin/sh
-info='adminmsg.sh/gigof // 18-11-12 // HB9KNS'
+info='adminmsg.sh/gigof // 18-11-21 // HB9KNS'
 inbox=inbox
 outbox=outbox
 outflag="$outbox.flag"
@@ -82,7 +82,8 @@ Date: `date`
 
 EOT
     cat $tmpf >>$ud/$inbox
-    echo 'written!'
+    rm -f $ud/$outflag
+    echo 'written and outbox flag reset'
    else echo "aborting -- still saved in $tmpf"
    fi
    ;;

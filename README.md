@@ -30,8 +30,14 @@ new user.
 
 + none: contains only `non-interactive-login` to inform the
   user that interactive access is blocked
-- gitmaint: contains script for `git gc` and `git fsck`;
-  *target repos must be hardcoded in the script!*
++ basics: basic commands for housekeeping, read/write admin messages
+  *file names are hardcoded in scripts!*
+
+## adminmsg.sh
+
+*status: alpha*
+
+script for admin side of user communication
 
 ---
 
