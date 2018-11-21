@@ -66,6 +66,7 @@ sleep 1
 subid=`genid`
 
 cat <<EOH
+
 SID $subid
 Welcome to the application process for new accounts!
 You have $mdgrace millidays to finish,
@@ -129,13 +130,12 @@ do read pubpart
 done
 
 cat <<EOT
-your entered key data:
----
+ user name: '$newname'
+ pubkey data:
 $pubkey
----
 
-Please confirm correctness of submitted information with "ok"
-(without the quotes)!
+ Please confirm correctness of submitted information with "ok"
+ (without quotes)!
 EOT
 
 read pubpart
@@ -143,9 +143,9 @@ if test "$pubpart" = "ok" -o "$pubpart" = "OK"
 then cat <<EOT >> $submit
 
 # `date -u`
- SSH_CLIENT=$SSH_CLIENT
- newname=$newname
- subid=$subid
+ SSH_CLIENT=$SSH_CLIENT=
+ newname=$newname=
+ subid=$subid=
  pubkey=$pubkey
 
 -----
@@ -161,4 +161,7 @@ else echo submission process aborted
 fi
 
 kill $wpid
-echo ........................................................NO CARRIER
+sleep 1
+echo releasing workspace
+sleep 1
+echo .....NO CARRIER
