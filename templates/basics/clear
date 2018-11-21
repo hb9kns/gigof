@@ -1,0 +1,18 @@
+#!/bin/sh
+outbox=$HOME/outbox
+outflag=$HOME/outbox.flag
+cat <<EOT
+Clearing all messages sent to admin.
+Confirm with ok
+EOT
+
+read line
+if test "$line" = "ok"
+then cat <<EOM >$outbox
+From $USER
+Date `date`
+all cleared.
+EOM
+ rm -f $outflag
+ echo cleared.
+fi
