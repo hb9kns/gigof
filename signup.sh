@@ -26,7 +26,7 @@ timeout() {
 
 # cleanup and end
 finish() {
- /bin/rm -f $lockf
+ rm -f $lockf
  echo >&2
  echo "finished -- good bye!" >&2
  kill $wpid
@@ -41,6 +41,16 @@ watchdog() {
  sleep 1
 }
 
+# generate random ID
+genid(){
+ local tid
+ if env uuidgen >/dev/null 2>&1
+ then tid=`uuidgen | tr -c -d 0-9`
+ else tid="`date +%s`$$"
+ fi
+ echo $tid | sed -e 's/$/ 925737%74263+p/'|dc
+}
+
 trap finish HUP INT TERM QUIT ABRT
 trap timeout ALRM
 
@@ -53,16 +63,20 @@ sleep 1
 echo CARRIER DETECTED. SYNCHRONIZING LOCAL OSCILLATOR...
 sleep 1
 
-cat <<EOH
+subid=`genid`
 
+cat <<EOH
+SID $subid
 Welcome to the application process for new accounts!
-You have $mdgrace millidays to finish this.
-After that time, the process will abort.
+You have $mdgrace millidays to finish,
+then the process will abort.
 You can abort at any time with ^C (CTRL-C).
 
 Please enter your desired username!
 ($minlen to 8 characters, only letters and numbers,
-first character must be a letter)
+first character must be a letter,
+checked for collision with existing ones,
+but final decision will be made during backend processing)
 EOH
 
 newname=''
@@ -113,9 +127,6 @@ do read pubpart
   *) pubkey="$pubkey$pubpart" ;;
  esac
 done
-
-# generate random submission id
-subid=`uuidgen | tr -c -d 0-9 | sed -e 's/$/ 925737%74263+p/'|dc`
 
 cat <<EOT
 your entered key data:
