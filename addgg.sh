@@ -1,5 +1,5 @@
 #!/bin/sh
-info='addgg.sh/gigofs // 18-11-15 // HB9KNS'
+info='addgg.sh/gigof // 18-11-15 // HB9KNS'
 # add git-only gopher user and set up their directories
 
 # minimal user id for generated accounts

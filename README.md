@@ -17,6 +17,13 @@ blocking non-git shell access; installs `git-shell` as login shell
 custom login shell for automatic and unattended setup for new user
 accounts; uses `addgg.sh`
 
+## instsign.sh
+
+*status: alpha*
+
+script for installation of signup user
+(anonymous login to signup.sh)
+
 ## templates/
 
 *status: beta*
@@ -33,7 +40,7 @@ new user.
 + basics: basic commands for housekeeping, read/write admin messages
   *file names are hardcoded in scripts!*
 
-## adminmsg.sh
+## msgadm.sh
 
 *status: alpha*
 
