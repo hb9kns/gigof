@@ -1,2 +1,13 @@
 #!/bin/sh
-/bin/ls -l
+rd=r
+cat <<EOL | more
+## home dir ##
+`/bin/ls -l`
+EOL
+if test -d $rd
+then cat <<EOL | more
+## $rd (repositories) dir ##
+`/bin/ls -l $rd`
+EOL
+else echo "(no $rd dir)"
+fi
