@@ -7,14 +7,14 @@ rnmlen=12
 # function for listing repos and (if arg=sel) returning name
 listrd() {
  local rl
- rl=`ls -1|nl`
- echo $rl >&2
+ rl="`ls -1|nl`"
+ echo "$rl" >&2
  if test "$1" = "sel"
  then
   echo ' which?' >&2
   read ind
   ind=`echo "$ind" | tr -c -d 0-9`
-  echo $rl | grep "^ *${ind} " | sed -e 's/ *[1-9][0-9]* //'
+  echo "$rl" | grep "^ *${ind} " | sed -e 's/ *[1-9][0-9]* //'
  fi
 }
 
