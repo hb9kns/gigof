@@ -26,8 +26,8 @@ if test ! -d $rd
 then mkdir $rd
  echo "(new $rd directory created)"
 fi
-# with private permissions
-chmod 700 $rd
+# with all read and execute permissions
+chmod 755 $rd
 # and go there
 cd $rd
 
@@ -49,10 +49,11 @@ add) echo "name of new repo (up to $rnmlen letters and numbers):"
 # add suffix and check whether exists
  then rena=$rena.git
   if test ! -d $rena
-  then echo "installing new (bare) git repo $rena"
+  then echo "installing new (bare, accessible) git repo $rena"
    mkdir $rena
-   chmod 700 $rena
+   chmod 3755 $rena
    git init --bare $rena
+   touch $rena/git-daemon-export-ok
   else echo "repo $rena already exists!"
   fi
   cat <<EOH
