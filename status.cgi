@@ -1,6 +1,8 @@
 #!/bin/sh
 adir=/var/local/accounts
 
+sleep 1
+
 # sanitize input
 sid=`echo "$QUERY_STRING"|tr -c -d 0-9`
 # dummy, if no input
@@ -13,8 +15,7 @@ sman=`grep "=$sid=" $adir/processed.txt | sed -e 's/=[^=]*= //'`
 stat=${sman:-$ssub}
 
 cat <<EOT
-!Ryumin's Dome submission status report
-i SID=$sid	
-iSTAT=$stat	
-iDATE=`date -u`
+ SID=$sid
+STAT=$stat
+DATE=`date -u`
 EOT
