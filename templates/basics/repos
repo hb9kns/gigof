@@ -1,8 +1,8 @@
 #!/bin/sh
 # directory for additional repositories
 rd=r
-# max.length or repo names
-rnmlen=15
+# max.length of repo names
+rnmlen=12
 
 # function for listing repos and (if arg=sel) returning name
 listrd() {
@@ -29,16 +29,17 @@ echo repositories:
 listrd
 cat <<EOH
 
-Please enter 'add' to add a new repository,
+Please enter 'add' to add a new repository (.git will be appended),
 or 'del' to select a repository for deletion:
 EOH
 read cmd
 case $cmd in
-add) echo 'name of new repo (only letters, numbers and -):'
+add) echo "name of new repo (up to $rnmlen letters, numbers and -):"
  read rena
  rena=`echo "$rena" | tr -c -d 0-9A-Za-z-`
  if test ${#rena} -ge 2 -a ${#rena} -le $rnmlen
- then if test ! -d $rena
+ then rena=$rena.git
+  if test ! -d $rena
   then echo "installing new (bare) git repo $rena"
    mkdir $rena
    chmod 700 $rena
