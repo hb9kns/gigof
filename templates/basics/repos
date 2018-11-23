@@ -14,16 +14,21 @@ listrd() {
  then
   echo ' which?' >&2
   read ind
+# sanitize input to number only
   ind=`echo "$ind" | tr -c -d 0-9`
+# search for line number, filter out directory name
   echo "$rl" | grep "^ *${ind} " | sed -e 's/ *[1-9][0-9]* //'
  fi
 }
 
+# make sure repo directory exists
 if test ! -d $rd
 then mkdir $rd
  echo "(new $rd directory created)"
 fi
+# with private permissions
 chmod 700 $rd
+# and go there
 cd $rd
 
 echo repositories:
@@ -35,10 +40,13 @@ or 'del' to select a repository for deletion:
 EOH
 read cmd
 case $cmd in
-add) echo "name of new repo (up to $rnmlen letters, numbers and -):"
+add) echo "name of new repo (up to $rnmlen letters and numbers):"
  read rena
- rena=`echo "$rena" | tr -c -d 0-9A-Za-z-`
+# sanitize input to letters and numbers only
+ rena=`echo "$rena" | tr -c -d 0-9A-Za-z`
+# and check for length
  if test ${#rena} -ge 2 -a ${#rena} -le $rnmlen
+# add suffix and check whether exists
  then rena=$rena.git
   if test ! -d $rena
   then echo "installing new (bare) git repo $rena"
