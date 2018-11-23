@@ -2,7 +2,7 @@
 adir=/var/local/accounts
 
 # sanitize input
-sid=`echo "$sid"|tr -c -d 0-9`
+sid=`echo "$QUERY_STRING"|tr -c -d 0-9`
 # dummy, if no input
 sid=${sid:-NIL}
 # get info from submission file
