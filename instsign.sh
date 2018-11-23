@@ -5,6 +5,15 @@
 newuser=new
 # login shell path
 lish=/var/local/gigof/signup.sh
+
+# following MUST correspond to settings in status.cgi
+# account status path
+adir=/var/local/accounts
+# submission file (in newuser's home directory)
+ssub=submissions.txt
+# file with messages from manual process (in adir)
+sman=processed.txt
+
 # options for useradd
 # shell must be absolute path into installation directory of gigof
 addopts="--shell $lish --create-home --gid nogroup --system"
@@ -26,6 +35,11 @@ then echo "$newuser already exists, aborting!"
  exit 8
 fi
 
+if test ! -d $adir
+then echo "$adir nonexistent, aborting!"
+ exit 7
+fi
+
 # find useradd
 usradd=`command -v useradd`
 if test "$usradd" = ""
@@ -43,6 +57,15 @@ else
  echo :: missing useradd tool, aborting
  exit 5
 fi
+
+# make symlink from status report area to newuser's file
+ln -s /home/$newuser/$ssub $adir/$ssub
+# make sure file exists, for status.cgi
+cat <<EOT >$adir/$sman
+# installed `date -u` by $0
+# dummy:
+=NIL= no information listed
+EOT
 
 cat <<EOT
 $newuser is installed: `id $newuser`
