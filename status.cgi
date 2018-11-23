@@ -13,6 +13,7 @@ ssub=`grep "=$sid=" $adir/submissions.txt 2>/dev/null | sed -e 's/=[^=]*= //'`
 sman=`grep "=$sid=" $adir/processed.txt | sed -e 's/=[^=]*= //'`
 # manual status overrides submission status
 stat=${sman:-$ssub}
+stat=${stat:-no information listed}
 
 cat <<EOT
  SID=$sid
