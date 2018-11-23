@@ -145,7 +145,7 @@ then cat <<EOT >> $submit
 # `date -u`
  SSH_CLIENT=$SSH_CLIENT=
  newname=$newname=
- subid=$subid=
+ subid=$subid= SUBMISSION LOGGED
  pubkey=$pubkey
 
 -----
