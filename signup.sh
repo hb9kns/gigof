@@ -27,8 +27,10 @@ timeout() {
 # cleanup and end
 finish() {
  rm -f $lockf
- echo >&2
- echo "finished -- good bye!" >&2
+ sleep 1
+ echo releasing workspace >&2
+ sleep 1
+ echo .....NO CARRIER >&2
  kill $wpid
  exit ${1:-0}
 }
@@ -160,8 +162,4 @@ EOT
 else echo submission process aborted
 fi
 
-kill $wpid
-sleep 1
-echo releasing workspace
-sleep 1
-echo .....NO CARRIER
+finish

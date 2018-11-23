@@ -3,12 +3,22 @@
 
 # account name
 newuser=new
+# login shell path
+lish=/var/local/gigof/signup.sh
 # options for useradd
 # shell must be absolute path into installation directory of gigof
-addopts="--shell /var/local/gigof/signup.sh --create-home --gid nogroup --system"
+addopts="--shell $lish --create-home --gid nogroup --system"
 
 if test `id -u` -gt 0
-then echo 'must be root or run with sudo, aborting!'
+then cat <<EOT
+
+::: must be root or run with sudo, aborting! :::
+
+This script sets up a system account '$newuser'
+with login shell '$lish'
+for accepting new user requests.
+
+EOT
  exit 9
 fi
 if id $newuser >/dev/null 2>&1
