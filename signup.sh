@@ -4,8 +4,6 @@
 # submissions log
 submit=$HOME/submissions.txt
 lockf=$submit.lock
-# where submission status will be reported
-substat='gopher://dome.circumlunar.space/1/submissions/'
 # timeout/seconds
 grace=300
 mdgrace=$(( 10*$grace/864 ))
@@ -27,7 +25,7 @@ timeout() {
 # cleanup and end
 finish() {
  rm -f $lockf
- sleep 1
+ echo
  echo releasing workspace >&2
  sleep 1
  echo .....NO CARRIER >&2
@@ -154,9 +152,9 @@ then cat <<EOT >> $submit
 EOT
  cat <<EOT
 Thank you for your submission! It will be reviewed as soon as possible.
-Status report of submission can be requested at
- $substat
-with submission ID $subid -- please save for future reference!
+See this server's gopher root for information about getting status report
+of your submission ID $subid -- please save for future reference.
+(NB: $subid will be required for getting report!)
 
 EOT
 else echo submission process aborted
