@@ -4,7 +4,7 @@
 
 ## addgg.sh
 
-*status: beta*
+*status: usable*
 
 script for installing a new user with predefined gopher directory and
 related git repo, permitting remote pushing with automatic update,
@@ -26,7 +26,7 @@ script for installation of signup user
 
 ## templates/
 
-*status: beta*
+*status: usable*
 
 collection of sample script directories to be used
 as interactive custom commands for `git-shell`
@@ -42,7 +42,7 @@ new user.
 
 ## msgadm.sh
 
-*status: alpha*
+*status: usable*
 
 script for admin side of user communication
 

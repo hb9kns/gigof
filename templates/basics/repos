@@ -1,0 +1,78 @@
+#!/bin/sh
+# directory for additional repositories
+rd=r
+# max.length or repo names
+rnmlen=15
+
+# function for listing repos and (if arg=sel) returning name
+listrd() {
+ local rl
+ rl=`ls -1|nl`
+ echo $rl >&2
+ if test "$1" = "sel"
+ then
+  echo ' which?' >&2
+  read ind
+  ind=`echo "$ind" | tr -c -d 0-9`
+  echo $rl | grep "^ *${ind} " | sed -e 's/ *[1-9][0-9]* //'
+ fi
+}
+
+if test ! -d $rd
+then mkdir $rd
+ echo "(new $rd directory created)"
+fi
+chmod 700 $rd
+cd $rd
+
+echo repositories:
+listrd
+cat <<EOH
+
+Please enter 'add' to add a new repository,
+or 'del' to select a repository for deletion:
+EOH
+read cmd
+case $cmd in
+add) echo 'name of new repo (only letters, numbers and -):'
+ read rena
+ rena=`echo "$rena" | tr -c -d 0-9A-Za-z-`
+ if test ${#rena} -ge 2 -a ${#rena} -le $rnmlen
+ then if test ! -d $rena
+  then echo "installing new (bare) git repo $rena"
+   mkdir $rena
+   chmod 700 $rena
+   git init --bare $rena
+  else echo "repo $rena already exists!"
+  fi
+  cat <<EOH
+ repo can be cloned/pushed as HOSTNAME:$rd/$rena
+ where HOSTNAME is your ssh definition for accessing your account
+EOH
+ else echo "'$rena' is too short or longer than $rnmlen, not created!"
+ fi
+ ;;
+del) echo 'Please enter number of repo to delete:'
+ rena=`listrd sel`
+ if test "$rena" != ""
+ then
+  echo "Please confirm with ok to delete repo '$rena'!"
+  read cmd
+  if test "$cmd" = "ok" -o "$cmd" = "OK"
+  then rm -rf $rena
+   echo "'$rena' is deleted"
+  else echo "'$rena' is kept"
+  fi
+ else echo nothing selected
+ fi
+ ;;
+*) echo 'unrecognized command ignored'
+ ;;
+esac
+
+cat <<EOT
+
+repositories now present:
+EOT
+listrd
+echo
