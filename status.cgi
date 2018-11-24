@@ -16,7 +16,5 @@ stat=${sman:-$ssub}
 stat=${stat:-no information listed}
 
 cat <<EOT
- SID=$sid
-STAT=$stat
-DATE=`date -u`
+i =$sid= $stat	
 EOT
