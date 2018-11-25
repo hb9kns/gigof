@@ -12,10 +12,17 @@ blocking non-git shell access; installs `git-shell` as login shell
 
 ## signup.sh
 
-*status: alpha*
+*status: usable*
 
-custom login shell for automatic and unattended setup for new user
-accounts; uses `addgg.sh`
+custom login shell for automatic and unattended logging of new user
+account submissions (requests)
+
+## setstat.sh
+
+*status: beta*
+
+script for admin, to set status messages for account submissions
+(which are then accessible for users through gopher)
 
 ## instsign.sh
 
