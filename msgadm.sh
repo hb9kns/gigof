@@ -87,7 +87,7 @@ EOT
    else echo "aborting -- still saved in $tmpf"
    fi
    ;;
-  i*) $pager $ud/$inbox
+  r*) $pager $ud/$inbox
    ;;
   clear) date -u '+cleared on %c' >$ud/$inbox
    ;;
