@@ -5,8 +5,7 @@
 submit=$HOME/submissions.txt
 lockf=$submit.lock
 # timeout/seconds
-grace=300
-mdgrace=$(( 10*$grace/864 ))
+grace=333
 # minimal length of new user name
 minlen=4
 # illegal/reserved names (in addition to those in /etc/passwd and /etc/group)
@@ -48,7 +47,7 @@ genid(){
  then tid=`uuidgen | tr -c -d 0-9`
  else tid="`date +%s`$$"
  fi
- echo $tid | sed -e 's/$/ 925737%74263+p/'|dc
+ echo $tid | sed -e 's/$/ 9857347%742683+p/'|dc
 }
 
 trap finish HUP INT TERM QUIT ABRT
@@ -67,10 +66,10 @@ subid=`genid`
 
 cat <<EOH
 
-SID $subid
+SID=$subid=
+
 Welcome to the application process for new accounts!
-You have $mdgrace millidays to finish,
-then the process will abort.
+You have $grace seconds to finish, then the process will abort.
 You can abort at any time with ^C (CTRL-C).
 
 Please enter your desired username!
@@ -125,7 +124,7 @@ do read pubpart
    echo "starting over with empty buffer"
    ;;
   .) echo "finished" ;;
-  *) pubkey="$pubkey$pubpart" ;;
+  *) pubkey="$pubkey;;;$pubpart" ;;
  esac
 done
 
