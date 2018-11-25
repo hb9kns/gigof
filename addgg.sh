@@ -51,6 +51,7 @@ STDIN will be read for public ssh keys; No password access, only pubkey.
 The user's shell will be '$gitshell', and if <git-shell-dir> is readable,
 the contained scripts will be made available for interactive login;
 with '-s' they will be copied, with '-l' a symbolic link will be installed.
+NB: <git-shell-dir> should be absolute, for safety reasons!
 
 This script needs the 'useradd' tool to be available,
 and evidently must be run as root or through sudo.
@@ -169,15 +170,15 @@ EOH
  if test $gslink = yes
  then
   echo :: installing git-shell-commands link to $gsdir
-  ln -s "$oldd/$gsdir" git-shell-commands
+  ln -s "$gsdir" git-shell-commands
  else
-  if test -d "$oldd/$gsdir" -a -r "$oldd/$gsdir" -a -x "$oldd/$gsdir"
+  if test -d "$gsdir" -a -r "$gsdir" -a -x "$gsdir"
   then echo :: installing git-shell-commands directory with contents of $gsdir
    mkdir git-shell-commands
 # prevent scripts from being modified
    chown root:$ggroup git-shell-commands
    chmod 3755 git-shell-commands
-   /bin/cp "$oldd/$gsdir"/* git-shell-commands/
+   /bin/cp "$gsdir"/* git-shell-commands/
    chmod 755 git-shell-commands/*
   else echo :: no readable git-shell-commands template found
   fi
