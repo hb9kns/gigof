@@ -59,6 +59,7 @@ else
 fi
 
 # make symlink from status report area to newuser's file
+sudo -u $newuser touch /home/$newuser/$ssub
 ln -s /home/$newuser/$ssub $adir/$ssub
 # make sure file exists, for status.cgi
 cat <<EOT >$adir/$sman
