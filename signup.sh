@@ -22,8 +22,11 @@ timeout() {
 }
 
 # cleanup and end
+# arg.1=errcode, arg.2==nolock then do not remove lockfile
 finish() {
- rm -f $lockf
+ if test "$2" != "nolock"
+ then rm -f $lockf
+ fi
  echo
  echo releasing workspace >&2
  sleep 1
@@ -61,6 +64,16 @@ echo BUILDING LINK...
 sleep 1
 echo CARRIER DETECTED
 echo CONNECTION ENDPOINTS: $SSH_CONNECTION
+
+if test -f $lockf
+then cat <<EOT
+
+SYSTEM BUSY
+PLEASE RETRY IN $(( `genid` % 55 + 33 )) SECONDS
+
+EOT
+ finish 1 nolock
+fi
 
 subid=`genid`
 
@@ -143,9 +156,9 @@ then cat <<EOT >> $submit
 
 # `date -u`
  SSH_CLIENT=$SSH_CLIENT=
- newname=$newname=
- subid=$subid= SUBMISSION LOGGED `date -u`
- pubkey=$pubkey
+ =$subid= SUBMISSION LOGGED `date -u`
+ <$newname>
+ $pubkey
 
 -----
 EOT
