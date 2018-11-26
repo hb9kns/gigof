@@ -3,6 +3,8 @@
 rd=r
 # max.length of repo names
 rnmlen=12
+# see 'git help daemon'
+gitexp=git-daemon-export-ok
 
 # function for listing repos and (if arg=sel) returning name
 listrd() {
@@ -36,7 +38,9 @@ listrd
 cat <<EOH
 
 Please enter 'add' to add a new repository (.git will be appended),
-or 'del' to select a repository for deletion:
+or 'delete' to select a repository for deletion,
+or 'private' to select a repository for blocking git-daemon-export,
+or 'public' to select a repository for permitting git-daemon-export:
 EOH
 read cmd
 case $cmd in
@@ -63,7 +67,7 @@ EOH
  else echo "'$rena' is too short or longer than $rnmlen, not created!"
  fi
  ;;
-del) echo 'Please enter number of repo to delete:'
+delete) echo 'Please enter number of repo to delete:'
  rena=`listrd sel`
  if test "$rena" != ""
  then
@@ -75,6 +79,23 @@ del) echo 'Please enter number of repo to delete:'
   else echo "'$rena' is kept"
   fi
  else echo nothing selected
+ fi
+ ;;
+private|public) if test -f $permf
+ then
+  echo 'Please enter number of repo:'
+  rena=`listrd sel`
+  if test "$rena" != ""
+  then
+   if test "$cmd" = "private"
+   then rm -f $rena/$gitexp
+    echo "'$rena/$gitexp' is removed"
+   else touch $rena/$gitexp
+    echo "'$rena/$gitexp' is installed"
+   fi
+  else echo nothing selected
+  fi
+ else echo 'Sorry, you lack permission to toggle git-daemon-export!'
  fi
  ;;
 *) echo 'unrecognized command ignored'
