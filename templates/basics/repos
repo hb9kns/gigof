@@ -6,6 +6,12 @@ rnmlen=12
 # see 'git help daemon'
 gitexp=git-daemon-export-ok
 
+# set flag for public/private commands
+if test -f allow-private-repos
+then privrep=yes
+else privrep=no
+fi
+
 # function for listing repos and (if arg=sel) returning name
 listrd() {
  local rl
@@ -81,7 +87,7 @@ delete) echo 'Please enter number of repo to delete:'
  else echo nothing selected
  fi
  ;;
-private|public) if test -f $permf
+private|public) if test $privrep = yes
  then
   echo 'Please enter number of repo:'
   rena=`listrd sel`
