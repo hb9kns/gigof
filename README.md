@@ -1,7 +1,7 @@
 # gigof : framework for public Git gopher server
 
 This script suite is used to run the git-gopher-services on
-gopher://dome.circumlunar.space/.
+[Ryumin's Dome]( gopher://dome.circumlunar.space/ ).
 
 It consists of various administrator scripts
 (normally run through `sudo` or as root)
@@ -38,11 +38,17 @@ In addition, administrative tools like `sudo` and `adduser`
 are required. The repective commands currently are hard coded,
 i.e the scripts require manual modifications for other tools.
 
-In addition, `ssh` and `gophernicus` (or another gopher server)
-must be installed and working; management of these tools will
-not be covered here.
+In addition, `git` , `ssh` and `gophernicus` (or a compatible gopher
+server) must be installed and working for all users on the default
+file paths; management of these tools will not be covered here, but
+in most systems, standard installations of these tools should work
+out of the box.
 
-#### installing submission request user
+Newly created git-gopher accounts will belong to group `gigofs`
+which must be set up manually, e.g with `addgroup` -- alternatively,
+the `addgg.sh` script could be modified to use an existing group.
+
+#### installing submission request account
 
 To permit future users to submit their desired user/account
 names and public ssh keys for access, the script `instsign.sh`
@@ -63,26 +69,28 @@ a password for remote login must be set, typically also `new`
 or something similarly simple: this must be published anyway,
 for prospective users to be able to submit applications.
 
+### everyday use
+
 #### submitting new user account requests
 
 This workflow is on the user side. Prospective users must know
 the sshd port and the host IP, so that they may log in as the
 `new` user described above. Then they may enter their desired
 user name (which is sanitized to be 4 to 8 characters long,
-only letters and numbers) and ssh public key material. If they
-do not provide any functional pubkey, login to the account will
-not be possible.
+only letters and numbers) and ssh public key material.  If they
+do not provide functional pubkey(s), login to the account will
+*never be possible!*
 
 The `signup.sh` script has a builtin timeout of about 5 min, i.e
 an account request must be finished in that time, otherwise the
 process will abort.
 
-If successful, the signup process will report back to the user
-a submission ID number for later reference. Users may look up
+If successful, the signup process will report back to the user a
+random submission ID number for later reference. Users may look up
 the status with help of that number by submitting it to the
-`status.cgi` script reachable through the gopher server on the
-gigof host. If the request is accepted and the account installed,
-they can connect to it with ssh and git push/pull to their repos.
+`status.cgi` script reachable through the gopher server on the gigof
+host. If the request is accepted and the account installed, they
+can connect to it with ssh and git push/pull to their repos.
 
 By default, one repository is installed, named `gopher.git` and
 located in the user's home directory, which is linked to the
@@ -104,8 +112,8 @@ Users can submit a desired account name and ssh pubkey material,
 all saved in the file `/var/local/accounts/submissions.txt` as
 textfile. Administrators should get the data from that file and
 feed it to the `addgg.sh` script as described below, then use
-`setstat.sh` to report back to users acceptance or refusal of
-the requests.
+`setstat.sh` to report back to users the acceptance or refusal of
+requests.
 
 The CGI script `status.cgi` can be installed in a cgi-bin
 gopher directory. It requires (as Gopher search query) a
@@ -114,9 +122,125 @@ the corresponding submission status.
 
 #### setting up user accounts
 
+The script `addgg.sh` takes as arguments a directory containing
+pre-defined scripts for interactive launch by git-shell, and an
+account name that should be newly installed.
 
+Furthermore, the script expects public-keys for ssh on STDIN, one
+line per key (standard `id_xxx.pub` format); if entered manually,
+finish entry with a single CTRL-D on a line.
 
-## scripts
+If the account name is not reserved, conforms to the requirements
+(4 to 8 letters or numbers), and does not yet exist, it will be
+installed with a dedicated `gigofs` group.
+
+The script installs a `public_gopher` directory and a bare `gopher.git`
+repository, together with a git post-update hook for publication
+of `gopher.git` contents into `public_gopher` whenever new content
+is pushed into the former.  The config of `gopher.git` is populated
+with pseudonymous entries to prevent leaking of personal data;
+however, it is up to the users to make sure not to commit locally
+with compromising user.name and user.email configurations!
+
+Public-keys will be added to the new user's `.ssh/authorized_keys` file.
+
+#### managing user accounts
+
+Simple communication with users having `basics` git-shell commands
+is possible through text files handled on the administrator side by
+`msgadm.sh` and by the `read/write/clear` commands on the user side.
+
+The `msgadm.sh` script displays a list of all user accounts and
+whether they have any pending (unanswered) messages in their outbox.
+After selection of a user, the administrator can then clear their
+inbox or write a reply (therefore clearing the outbox flag) using
+the editor defined in `$EDITOR` environment variable.
+
+The administrator can permit users to keep private additional git
+repositories with the `privrep.sh` script. This will activate the
+`private/public` subcommands of the `repos` script, which remove/add
+the `git-daemon-export-ok` file to the repository in question.  By
+default, all additional repos except for `gopher.git` contain this
+file and therefore may be accessible (public) from outside through
+`git daemon` (see below).
+
+#### exporting additional git repos
+
+The `gitexplist.sh` script puts together a list of all `*.git`
+repositories found in `/var/local/` (meant for common host-wide
+repos) as well as all additional user repos in their home directories
+in the `r` subdirectory and containing `git-daemon-export-ok` in
+their `.git` (see above, e.g interactive git-shell access).
+
+This list for example could be published through gopher for external
+users to find the various repositories which can then be cloned
+through git-daemon, if this is running on the system.
+
+The script `gitdaemon.sh` provides an example of running `git daemon`
+with the correct settings. On a productive system, this might be
+set up through `init` or `inetd` or similar means. For testing or
+on small systems, it is also feasible to run the script in the
+background or a detached terminal under an unprivileged user account.
+
+#### interactive git-shell access
+
+If the account is installed with the template `none` then no
+interactive git-shell access will be possible, and login attempts
+will fail.  In that case, the user will have no possibility to
+interact with the system other than through git access to the
+`gopher.git` repository.
+
+Various types of script environments for git-shell can be set up.
+On `dome.circumlunar.space` the `basics` template is used.
+
+##### basics git-shell access
+
+This template provides several scripts to the user for interactive access.
+
+- `help` : provides a short description of available commands
+- `stat` : displays system information and size of user's home directory
+- `tidy` : searches for all `*.git` directories and does `git gc` and `fsck`
+- `read` : permits reading of messages from the system administrator
+- `write` : permits writing of messages to the system administrator
+- `clear` : clears all messages to the system administrator
+- `repos` : permits managing of additional repositories
+
+The `repos` command allows to add or remove additional repositories
+(which by default are in the directory `r` in the user's home), and
+if the user has been given permission by the administrator (using
+the `privrep.sh` script, see above), also to block or permit access
+by the git daemon, i.e from the outside as `git://host/~user/repo.git`
+for cloning and pulling.
+
+#### git-gopher access
+
+The main purpose of this script suite is to permit users to publish
+content at the address `gopher://host/~user` through the `gopher.git`
+repository.
+
+Initially, i.e after account generation, users should clone the repo with
+`git clone ssh://USER@dome.circumlunar.space:1010:/home/USER/gopher.git`
+where `USER` is the account name and `dome...1010` is the host's IP
+and sshd port. Then they should set up git configuration in that directory
+to prevent information leaks:
+
+	cd gopher
+	git config --local user.name "joe sixpack"
+	git config --local user.email "joe@example.com"
+
+or whatever other name and email is desired.
+Otherwise, the local information will be used and cannot be removed
+later on from the `gopher.git` repo!
+
+In the local `gopher` working directory, the user may then
+add/remove/rename files and directories at will, keeping in mind
+that this will be published immediately through the gopher server
+(e.g gophernicus) on the host side after commiting and pushing back
+to the remote.
+
+---
+
+## overview of scripts
 
 ### addgg.sh
 
