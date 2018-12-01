@@ -6,11 +6,11 @@ Please use git clone/push/pull to access your repo(s).
 In addition, you may use the following commands:
 
 * help  : this help
-* write : send message to system admin
-* read  : read messages from system admin (end with 'q')
-* repos : list/add/delete additional git repositories
 * stat  : display system status and disk usage of home directory
 * tidy  : search for '.git' and do 'git gc' and 'git fsck' there
+* read  : read messages from system admin (end with 'q')
+* write : send message to system admin
+* repos : list/add/delete additional git repositories
 * quit or exit : close this shell
 
 Please note: message exchange with sysadmin may be slow -- patience!

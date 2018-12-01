@@ -219,7 +219,7 @@ content at the address `gopher://host/~user` through the `gopher.git`
 repository.
 
 Initially, i.e after account generation, users should clone the repo with
-`git clone ssh://USER@dome.circumlunar.space:1010:/home/USER/gopher.git`
+`git clone ssh://USER@dome.circumlunar.space:1010/home/USER/gopher.git`
 where `USER` is the account name and `dome...1010` is the host's IP
 and sshd port. Then they should set up git configuration in that directory
 to prevent information leaks:
@@ -306,4 +306,4 @@ gopher query cgi script to report status of given submission ID
 
 ---
 
-*(2018-Nov // HB9KNS)*
+*(2018-Dec // HB9KNS)*
