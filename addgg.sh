@@ -1,5 +1,5 @@
 #!/bin/sh
-info='addgg.sh/gigof // 18-11-15 // HB9KNS'
+info='addgg.sh/gigof // 18-12-01 // HB9KNS'
 # add git-only gopher user and set up their directories
 
 # minimal user id for generated accounts
@@ -34,7 +34,8 @@ fi
 
 usage() { cat <<EOH >&2
 ($info)
-usage: $0 [-s|-l <git-shell-dir>] <username>
+
+usage: $0 [-b] [-s|-l <git-shell-dir>] <username>
 
 Install account for <username> with a '$pgd' directory
 (git repo with prepared hooks for direct publication after
@@ -48,10 +49,14 @@ and will be truncated to 8 characters maximum.
 In addition, '$ggroup' is not allowed as <username>.
 
 STDIN will be read for public ssh keys; No password access, only pubkey.
-The user's shell will be '$gitshell', and if <git-shell-dir> is readable,
-the contained scripts will be made available for interactive login;
+The user's shell will be '$gitshell',
+and if <git-shell-dir> is readable, then the contained scripts
+will be made available for interactive login:
 with '-s' they will be copied, with '-l' a symbolic link will be installed.
 NB: <git-shell-dir> should be absolute, for safety reasons!
+
+With '-b', repo '$ggr' will be bare and '$pgd' will be empty,
+allowing for pushing an existing external repo.
 
 This script needs the 'useradd' tool to be available,
 and evidently must be run as root or through sudo.
@@ -61,9 +66,10 @@ EOH
 # common options for useradd
 addopts="--create-home --shell $gitshell --groups $ggroup"
 
-# username empty, symlink flag cleared
+# username empty, symlink flag cleared, prepopulated repo
 usr=''
 gslink=no
+barep=no
 
 while test "$1" != ""
 do case $1 in
@@ -77,6 +83,9 @@ do case $1 in
     gslink=yes
     echo :: git-shell-dir-link=$gsdir
     shift ;;
+# option for bare repo (not populated with gophermap)
+ -b) barep=yes
+    ;;
  -*) echo :: ignoring option $1 ;;
  *) usr=$1 ;;
  esac
@@ -138,10 +147,13 @@ if cd $hdir/$usr
 then
  echo :: adding public_gopher dir and initial gophermap
  sudo -u $usr mkdir $pgd
- echo "$igm" | sed -e "s/USRN/$usr/g" > $pgd/gophermap
  chmod 755 $pgd
- chown $usr:$ggroup $pgd/gophermap
- chmod 644 $pgd/gophermap
+ if test $barep = no
+ then
+  echo "$igm" | sed -e "s/USRN/$usr/g" > $pgd/gophermap
+  chown $usr:$ggroup $pgd/gophermap
+  chmod 644 $pgd/gophermap
+ fi
  echo :: setting up git config
 # generate privacy-protecting user info
  sudo -u $usr git config --global user.name $usr
@@ -161,7 +173,7 @@ then
 # hook installed by $0
 echo post-update:
 unset GIT_DIR
-cd "$hdir/$usr/$pgd" && git pull && git checkout . && chmod -R a+r *
+cd "$hdir/$usr/$pgd" && git pull origin master && git checkout . && chmod -R a+r *
 find . -type f -execdir chmod a-x {} '+'
 EOH
 # prevent githook from being modified
@@ -187,9 +199,12 @@ EOH
  cd $pgd
 # link working to bare repo
  sudo -u $usr git remote add origin ~$usr/$ggr
- sudo -u $usr git add gophermap
- sudo -u $usr git commit -m "initial by $info"
- sudo -u $usr git push -u origin master
+ if test $barep = no
+ then
+  sudo -u $usr git add gophermap
+  sudo -u $usr git commit -m "initial by $info"
+  sudo -u $usr git push -u origin master
+ fi
  cd -
  echo :: adding .ssh/authorized_keys
  sudo -u $usr mkdir .ssh
