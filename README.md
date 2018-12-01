@@ -33,9 +33,9 @@ but for brevity, we're assuming the former.
 
 ### system setup
 
-The system needs to provide a standard POSIX toolchain.
-In addition, administrative tools like `sudo` and `adduser`
-are required. The repective commands currently are hard coded,
+The system needs to provide a standard POSIX toolchain,
+and administrative tools like `sudo` and `adduser` are required.
+The repective commands currently are hard coded,
 i.e the scripts require manual modifications for other tools.
 
 In addition, `git` , `ssh` and `gophernicus` (or a compatible gopher
@@ -142,6 +142,12 @@ with pseudonymous entries to prevent leaking of personal data;
 however, it is up to the users to make sure not to commit locally
 with compromising user.name and user.email configurations!
 
+With option '-b', the gopher directory and repository both will be
+empty and ready for uploading (push) an external existing git repo.
+Otherwise, a simple gophermap will be added to the gopher directory,
+and the result will be commited to the repository, making the latter
+being ready for cloning into an external new git repository.
+
 Public-keys will be added to the new user's `.ssh/authorized_keys` file.
 
 #### managing user accounts
@@ -241,6 +247,8 @@ to the remote.
 ---
 
 ## overview of scripts
+
+Most scripts will display usage information when launched without arguments.
 
 ### addgg.sh
 
