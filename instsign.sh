@@ -68,6 +68,12 @@ cat <<EOT >$adir/$sman
 =NIL= no information listed
 EOT
 
+# globally block portforwarding
+cat <<EOT >>/etc/ssh/sshd_config
+Match All
+ AllowTcpForwarding no
+EOT
+
 cat <<EOT
 $newuser is installed: `id $newuser`
 please set password according to your system requirements!
