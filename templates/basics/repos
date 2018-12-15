@@ -97,7 +97,10 @@ private|public) if test $privrep = yes
    then rm -f $rena/$gitexp
     echo "'$rena/$gitexp' is removed"
    else touch $rena/$gitexp
-    echo "'$rena/$gitexp' is installed"
+    cat <<EOI
+'$rena/$gitexp' is installed
+(publicly clonable as git://HOSTNAME/~$USER/$rena)
+EOI
    fi
   else echo nothing selected
   fi
