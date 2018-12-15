@@ -76,6 +76,6 @@ EOT
 
 cat <<EOT
 $newuser is installed: `id $newuser`
-please set password according to your system requirements!
-done.
+Please set password according to your system requirements,
+and restart a running sshd process (or force it to re-read config)!
 EOT
