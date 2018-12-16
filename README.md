@@ -218,6 +218,9 @@ This template provides several scripts to the user for interactive access.
 - `write` : permits writing of messages to the system administrator
 - `clear` : clears all messages to the system administrator
 - `repos` : permits managing of additional repositories
+- `mango` : provides commands for reinstalling initial gopherhole, or even
+  a completely bare gopherhole allowing to push a remote working repo
+  *Warning: destroys contents!*
 
 The `repos` command allows to add or remove additional repositories
 (which by default are in the directory `r` in the user's home), and
@@ -225,6 +228,14 @@ if the user has been given permission by the administrator (using
 the `privrep.sh` script, see above), also to block or permit access
 by the git daemon, i.e from the outside as `git://host/~user/repo.git`
 for cloning and pulling.
+
+The `mango` ("manage gopherhole") command provides the possibility to
+reinitialize the gopherhole and `gopher.git` as it was when the account
+was created, or (with the `bare` subcommand) to have a completely empty
+gopherhole and `gopher.git` (except for the publication githook); this
+allows to push content from an existing (working and already populated)
+remote repo.
+*Warning: These commands will destroy any existing gopherhole content!*
 
 #### git-gopher access
 
