@@ -11,6 +11,7 @@ In addition, you may use the following commands:
 * tidy  : search for '.git' and do 'git gc' and 'git fsck' there
 * read  : read messages from system admin (end with 'q')
 * write : send message to system admin
+* schat : simple local shell chat (if installed)
 * repos : list/add/delete additional git repositories
 * mango : manage gopherhole: reinitialize to state after account creation
           or prepare for pushing remote repository content

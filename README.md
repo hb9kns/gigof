@@ -216,6 +216,7 @@ This template provides several scripts to the user for interactive access.
 - `tidy` : searches for all `*.git` directories and does `git gc` and `fsck`
 - `read` : permits reading of messages from the system administrator
 - `write` : permits writing of messages to the system administrator
+- `schat` : call the simple local shell chat 'schat' if present
 - `clear` : clears all messages to the system administrator
 - `repos` : permits managing of additional repositories
 - `mango` : provides commands for reinstalling initial gopherhole, or even
@@ -236,6 +237,10 @@ gopherhole and `gopher.git` (except for the publication githook); this
 allows to push content from an existing (working and already populated)
 remote repo.
 *Warning: These commands will destroy any existing gopherhole content!*
+
+The `schat` command checks whether a `schat` command is available on the
+standard path, and if so executes it. This might be the simple shell chat
+[schat]( git://circumlunar.space/schat ) script.
 
 #### git-gopher access
 
