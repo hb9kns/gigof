@@ -1,0 +1,5 @@
+#!/bin/sh
+if test "`command -v schat`" != ""
+then exec schat
+else echo 'sorry, schat does not seem to be available!'
+fi
