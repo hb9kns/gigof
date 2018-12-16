@@ -1,0 +1,113 @@
+#!/bin/sh
+# git-shell command for managing main gopherhole and gopher.git
+
+# host information for hints, will have to be set manually for other hosts!
+hona=dome.circumlunar.space
+hopo=1010
+# file defaults
+goho=public_gopher
+goma=$goho/gophermap
+gore=gopher.git
+hook=$gore/hooks/post-update
+
+# template for gophermap
+igm="i$USER's gophermap	
+iautomatically recreated by $0	
+ion `date -u`.	"
+
+# initialize gopher hole and repo
+ingo() {
+ echo : removing existing gopherhole and repository
+ /bin/rm -rf $goho
+ /bin/rm -rf $gore
+ echo : creating and initializing fresh $goho
+ mkdir $goho
+ chmod 2775 $goho
+ git init $goho
+ chmod 700 $goho/.git
+ echo : creating and initializing fresh $gore
+ git init --bare $gore
+ chmod 700 $gore
+ echo : adding post-update githook for publication after push
+ cat <<EOH >$hook
+#!/bin/sh
+# hook installed by $0
+echo post-update:
+unset GIT_DIR
+cd "$HOME/$goho" && git pull origin master && git checkout . && chmod -R a+r *
+find . -type f -execdir chmod a-x {} '+'
+EOH
+# prevent hook from being modified and make executable
+ chmod 555 $hook
+# add gopher.git as remote to working dir
+ cd $goho
+ git remote add origin $HOME/$gore
+ cd - >/dev/null
+}
+
+# populate gopher hole and commit to repo
+pogo() {
+ echo : populating gopher hole
+ echo "$igm" >$goma
+ chmod 644 $goma
+ echo : adding fresh gophermap and committing to $gore
+ cd $goho
+ git add gophermap
+ git commit -m "initial by $0"
+ git push -u origin master
+}
+
+cat <<EOH
+
+**Warning: These commands will destroy content!**
+Make sure you have a local clone of your gopher content before using them!
+
+* init : initialize gopherhole and repo with only gophermap
+  (basically same as after account setup)
+* bare : initialize gopherhole and repo for pushing existing repo
+  (no content in hole and repo; suitable for uploading other repository)
+
+Please enter command (or anything else to abort):
+EOH
+read cmd
+case $cmd in
+init) echo 'WILL DESTROY EXISTING GOPHER CONTENT - please confirm with OK'
+ read cmd
+ if test "$cmd" = "OK"
+ then
+  ingo
+  pogo
+  cat <<EOH
+
+Your gopher hole and repository are in pristine state again!
+You may clone it with the command
+  git clone ssh://${USER}@$hona:$hopo/home/$USER/gopher.git
+(For rather pushing an existing repo, please run command 'bare' instead!)
+EOH
+ else echo 'aborted, no changes made'
+  exit 1
+ fi
+ ;;
+bare) echo 'WILL DESTROY EXISTING GOPHER CONTENT - please confirm with OK'
+ read cmd
+ if test "$cmd" = "OK"
+ then
+  ingo
+  cat <<EOH
+
+Your gopher hole and repository are completely emptied!
+You may push from an existing (remote) repository with the command
+  git push ssh://${USER}@$hona:$hopo/home/$USER/gopher.git master
+Or you may add an 'origin' remote on your other machine with this url, then
+  git push -u origin master
+to set up your git-gopher repository as main remote.
+(For rather cloning a fresh state, please run command 'init' instead!)
+EOH
+ else echo 'aborted, no changes made'
+  exit 1
+ fi
+ ;;
+*) echo 'unrecognized command ignored'
+ exit 0
+ ;;
+esac
