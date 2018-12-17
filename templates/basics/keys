@@ -1,0 +1,67 @@
+#!/bin/sh
+# key file
+kf=$HOME/.ssh/authorized_keys
+
+# function for listing keys and deleting (if arg=del)
+listky() {
+ local ky
+# numbered filelist
+ echo '1,$n'|/bin/ed $kf >&2
+ if test "$1" = "del"
+ then
+  echo ' which?' >&2
+  read ind
+# sanitize input to number only
+  ind=`echo "$ind" | tr -c -d 0-9`
+  if test X$ind != X
+  then
+# delete line
+  cat <<EOS | /bin/ed $kf
+  ${ind}d
+  w
+EOS
+  else echo : ignoring illegal index number
+  fi
+ fi
+}
+
+if ! test -r $kf -a -w $kf
+then cat <<EOT
+:: key file $kf
+:: cannot be read or written, aborting!
+EOT
+  exit 0
+fi
+
+while test "$cmd" != "q"
+do
+echo current key file:
+listky
+cat <<EOH
+
+Please enter 'add' to add a new public key
+or 'delete' to select one for deletion (any other input will quit):
+EOH
+read cmd
+case $cmd in
+add) echo enter new key on one single line:
+ read cmd
+ echo "$cmd" >>$kf
+ cmd=.
+ ;;
+delete) echo enter number of key to delete or x to abort:
+ listky del
+ cmd=.
+ ;;
+*) echo 'command unrecognized, quitting'
+ cmd=q
+ ;;
+esac
+done
+
+cat <<EOT
+
+current key file:
+EOT
+listky
+echo
