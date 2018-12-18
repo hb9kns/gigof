@@ -6,11 +6,12 @@ Welcome $USER, you have successfully logged in!
 
 Please use git clone/push/pull to access your repo(s).
 In addition, you may use the following commands:
-		(git-shell suite ver.18-12-18)
+		(git-shell suite ver.18-12-19)
 
 * help  : this help
 * stat  : display system status and disk usage of home directory
-* tidy  : search for '.git' and do 'git gc' and 'git fsck' there
+* tidy  : search for '.git' and do 'git gc' and 'git fsck' there,
+          then reinstall gopher directory from its git repository
 * keys  : add or delete public ssh keys (don't remove all of them!)
 * read  : read messages from system admin (end with 'q')
 * write : send message to system admin

@@ -1,5 +1,5 @@
 #!/bin/sh
-rc=.schatrc
+rc=.schatnrc
 gd=$HOME/public_gopher
 
 if test "`command -v schat`" = ""
@@ -15,7 +15,7 @@ then echo :: moving schat config ...
  ln -s $gd/$rc $rc
  cd $gd
  git add $rc
- git commit -m '(automatically adding .schatrc)'
+ git commit -m "(automatically adding $rc)"
  git push origin master
  echo :: done. you may now edit $rc in your gopher repository
 fi
