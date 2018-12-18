@@ -1,6 +1,8 @@
 #!/bin/sh
 inbox=$HOME/inbox
+inboxread=$HOME/inbox.read
 if test -s $inbox
 then more $inbox
 else echo no messages for you
 fi
+date -u >$inboxread

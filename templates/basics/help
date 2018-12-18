@@ -1,10 +1,12 @@
 #!/bin/sh
+inbox=$HOME/inbox
+inboxread=$HOME/inbox.read
 cat <<EOT
 Welcome $USER, you have successfully logged in!
 
 Please use git clone/push/pull to access your repo(s).
 In addition, you may use the following commands:
-		(git-shell suite ver.18-12-17)
+		(git-shell suite ver.18-12-18)
 
 * help  : this help
 * stat  : display system status and disk usage of home directory
@@ -12,6 +14,7 @@ In addition, you may use the following commands:
 * keys  : add or delete public ssh keys (don't remove all of them!)
 * read  : read messages from system admin (end with 'q')
 * write : send message to system admin
+* clear : clear all messages sent to system admin
 * schat : simple local shell chat (if installed)
 * repos : list/add/delete additional git repositories
 * mango : manage gopherhole: reinitialize to state after account creation
@@ -22,3 +25,10 @@ In addition, you may use the following commands:
 Please note: message exchange with sysadmin may be slow -- patience!
 
 EOT
+
+if test -s $inboxread -a -s $inbox
+then if ! test $inbox -ot $inboxread
+ then echo :: new message available ::
+ fi
+else echo :: please check messages ::
+fi
