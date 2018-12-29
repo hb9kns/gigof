@@ -1,0 +1,12 @@
+#!/bin/sh
+begin=/var/local/gigof/templates/basics/lynx.html
+if ! test -r $begin
+then begin=gopher://circumlunar.space
+fi
+
+if test "`command -v lynx`" = ""
+then echo 'sorry, lynx does not seem to be available!'
+ exit
+fi
+
+lynx -restrictions=all $begin
