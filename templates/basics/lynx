@@ -1,5 +1,9 @@
 #!/bin/sh
 begin=/var/local/gigof/templates/basics/lynx.html
+cfg=/var/local/gigof/templates/basics/lynx.cfg
+restrict='bookmark,bookmark_exec,change_exec_perms,chdir,compileopts_info,dired_support,disk_save,dotfiles,download,editor,exec,exec_frozen,externals,file_url,lynxcfg_info,lynxcfg_xinfo,lynxcgi,mail,multibook,news_post,outside_ftp,outside_news,outside_rlogin,print,shell,suspend,telnet_port,useragent'
+bm=lynx_bookmarks.html
+
 if ! test -r $begin
 then begin=gopher://circumlunar.space
 fi
@@ -9,4 +13,8 @@ then echo 'sorry, lynx does not seem to be available!'
  exit
 fi
 
-lynx -restrictions=all $begin
+lynx -cfg=$cfg -restrictions=$restrict $begin
+
+if test -f $bm
+then chmod 600 $bm
+fi
