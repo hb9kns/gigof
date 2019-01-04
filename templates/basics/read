@@ -1,8 +1,18 @@
 #!/bin/sh
 inbox=$HOME/inbox
 inboxread=$HOME/inbox.read
+# page length
+pl=11
 if test -s $inbox
-then more $inbox
+then
+ ml=`cat $inbox|wc -l`
+ al=1
+ while test $al -lt $ml
+ do sed -n -e "$al,$(( $al+$pl ))p" $inbox
+  echo :: press RETURN to continue ::
+  read _
+  al=$(( $al+$pl ))
+ done
 else echo no messages for you
 fi
 date -u >$inboxread
