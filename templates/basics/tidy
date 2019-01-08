@@ -15,3 +15,5 @@ echo ::: reinstalling gopherhole ...
 mkdir $pg
 chmod 755 $pg
 git clone $go $pg
+chmod -R a+r $pg
+find $pg -type f -execdir chmod a-x {} '+'
