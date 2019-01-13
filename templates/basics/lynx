@@ -5,7 +5,7 @@ restrict='bookmark,bookmark_exec,change_exec_perms,chdir,compileopts_info,dired_
 bm=lynx_bookmarks.html
 
 if ! test -r $begin
-then begin=gopher://circumlunar.space
+then begin=gopher://dome.circumlunar.space
 fi
 
 if test "`command -v lynx`" = ""
