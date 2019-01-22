@@ -1,0 +1,19 @@
+#!/bin/sh
+pg=$HOME/public_gopher
+go=$HOME/gopher.git
+echo ::: tidying up all .git ...
+find . -name '*.git' | { while read dd
+ do echo :: $dd
+  cd "$dd"
+  git gc --aggressive
+  git fsck --full
+  cd - >/dev/null
+ done
+}
+echo ::: reinstalling gopherhole ...
+/bin/rm -rf $pg
+mkdir $pg
+chmod 755 $pg
+git clone $go $pg
+chmod -R a+r $pg
+find $pg -type f -execdir chmod a-x {} '+'

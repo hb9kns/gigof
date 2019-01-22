@@ -1,0 +1,11 @@
+#!/bin/sh
+if test -r /etc/motd
+then cat /etc/motd
+fi
+uptime
+echo
+df -h
+echo
+du -hs $HOME
+echo
+date -u
