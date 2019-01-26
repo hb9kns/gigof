@@ -2,7 +2,7 @@
 # directory for additional repositories
 rd=r
 # max.length of repo names
-rnmlen=12
+rnmlen=20
 # see 'git help daemon'
 gitexp=git-daemon-export-ok
 
@@ -50,10 +50,13 @@ or 'public' to select a repository for permitting git-daemon-export:
 EOH
 read cmd
 case $cmd in
-add) echo "name of new repo (up to $rnmlen letters and numbers):"
+add) echo "name of new repo (up to $rnmlen letters, hyphens and numbers):"
  read rena
-# sanitize input to letters and numbers only
- rena=`echo "$rena" | tr -c -d 0-9A-Za-z`
+# sanitize input to letters, hyphens and numbers only
+ rena=`echo "$rena" | tr -c -d 0-9A-Za-z-`
+ while test X$rena != X${rena#-}
+ do rena=${rena#-}
+ done
 # and check for length
  if test ${#rena} -ge 2 -a ${#rena} -le $rnmlen
 # add suffix and check whether exists
