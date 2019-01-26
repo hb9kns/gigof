@@ -227,7 +227,7 @@ The `repos` command allows to add or remove additional repositories
 (which by default are in the directory `r` in the user's home), and
 if the user has been given permission by the administrator (using
 the `privrep.sh` script, see above), also to block or permit access
-by the git daemon, i.e from the outside as `git://host/~user/repo.git`
+by the git daemon, i.e from the outside as `git://host/~user/repo`
 for cloning and pulling.
 
 The `mango` ("manage gopherhole") command provides the possibility to
@@ -338,4 +338,4 @@ gopher query cgi script to report status of given submission ID
 
 ---
 
-*(2018-Dec // HB9KNS)*
+*(2019-Jan // HB9KNS)*

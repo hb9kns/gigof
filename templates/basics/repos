@@ -70,7 +70,7 @@ add) echo "name of new repo (up to $rnmlen letters, hyphens and numbers):"
   else echo "repo $rena already exists!"
   fi
   cat <<EOH
- repo can be cloned/pushed as HOSTNAME:$rd/$rena
+ repo can be ssh-cloned/pushed as HOSTNAME:$rd/$rena
  where HOSTNAME is your ssh definition for accessing your account
 EOH
  else echo "'$rena' is too short or longer than $rnmlen, not created!"
@@ -102,7 +102,7 @@ private|public) if test $privrep = yes
    else touch $rena/$gitexp
     cat <<EOI
 '$rena/$gitexp' is installed
-(publicly clonable as git://HOSTNAME/~$USER/$rena)
+(publicly clonable as git://HOSTNAME/~$USER/${rena%.git})
 EOI
    fi
   else echo nothing selected

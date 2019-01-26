@@ -30,7 +30,7 @@ for uu in *
 do udir=''
  for nn in $uu/$urep/*.git/$gitexp
  do if test -f $nn
-  then echo "git://$hn/~${nn%/*}" | sed -e "s,/$urep/,/,"
+  then echo "git://$hn/~${nn%.git/*}" | sed -e "s,/$urep/,/,"
   fi
  done
 done
