@@ -1,9 +1,19 @@
 #!/bin/sh
 # anonymous signup script, may be run as login shell
 
-# submissions log
-submit=$HOME/submissions.txt
-lockf=$submit.lock
+# must correspond to newuser's gopher root seen from outside:
+statusprefix=gopher://dome.circumlunar.space:70/0/~$USER
+# must correspond to contents of accdir in instsign.sh script:
+subdir=accounts
+statusprefix=$statusprefix/$subdir
+
+gophdir=$HOME/public_gopher
+mkdir -p $gophdir
+chmod a+rx $gophdir
+gophdir=$gophdir/$subdir
+mkdir -p $gophdir
+chmod a+rx $gophdir
+
 # timeout/seconds
 grace=333
 # minimal length of new user name
@@ -22,11 +32,8 @@ timeout() {
 }
 
 # cleanup and end
-# arg.1=errcode, arg.2==nolock then do not remove lockfile
+# arg.1=errcode
 finish() {
- if test "$2" != "nolock"
- then rm -f $lockf
- fi
  echo
  echo releasing workspace >&2
  sleep 1
@@ -50,7 +57,7 @@ genid(){
  then tid=`uuidgen | tr -c -d 0-9`
  else tid="`date +%s`$$"
  fi
- echo $tid | sed -e 's/$/ 9857347%742683+p/'|dc
+ echo $tid | sed -e 's/$/ 9851927347%74201683+p/'|dc
 }
 
 trap finish HUP INT TERM QUIT ABRT
@@ -64,16 +71,6 @@ echo BUILDING LINK...
 sleep 1
 echo CARRIER DETECTED
 echo CONNECTION ENDPOINTS: $SSH_CONNECTION
-
-if test -f $lockf
-then cat <<EOT
-
-SYSTEM BUSY
-PLEASE RETRY IN $(( `genid` % 55 + 33 )) SECONDS
-
-EOT
- finish 1 nolock
-fi
 
 subid=`genid`
 
@@ -152,24 +149,36 @@ EOT
 
 read pubpart
 if test "$pubpart" = "ok" -o "$pubpart" = "OK"
-then cat <<EOT >> $submit
-
+then cat <<EOT > $gophdir/$subid.txt
 # `date -u`
  SSH_CLIENT=$SSH_CLIENT=
- =$subid= SUBMISSION LOGGED `date -u`
+ =$subid= :NEW: SUBMISSION LOGGED `date -u`
  <$newname>
  $pubkey
 
------
 EOT
+ chmod a+r $gophdir/$subid.txt
  cat <<EOT
 Thank you for your submission! It will be reviewed as soon as possible.
-See this server's gopher root for information about getting status report
-of your submission ID $subid -- please save for future reference.
-(NB: $subid will be required for getting report!)
+See the following document for status report about your submission:
+  $statusprefix/$subid.txt
+(NB: save this for further reference!)
 
 EOT
 else echo submission process aborted
 fi
+
+# block directory listing by (re)setting explicit gophermap
+cat <<EOI >$gophdir/gophermap
+!Account submission status
+iSubmission status can be requested by getting the file from	
+ithis directory with name identical to the submission id	
+iand the extension '.txt' e.g	
+i $statusprefix/12345678.txt	
+iwhere 12345678 must be replaced by the id given	
+iduring the submission process.	
+.
+EOI
+chmod a+r $gophdir/gophermap
 
 finish
